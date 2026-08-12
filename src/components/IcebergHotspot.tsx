@@ -1,6 +1,6 @@
 import type { IcebergTopic } from '../types/iceberg'
 
-const HITBOX_W = 0.055
+const HITBOX_W = 0.09
 const HITBOX_H = 0.022
 
 type IcebergHotspotProps = {
@@ -29,7 +29,7 @@ export function IcebergHotspot({
         top: `${topic.y * 100}%`,
         width: `${HITBOX_W * 4}%`,
         height: `${HITBOX_H * 4}%`,
-        minWidth: 28,
+        minWidth: 44,
         minHeight: 16,
       }}
       className={[
