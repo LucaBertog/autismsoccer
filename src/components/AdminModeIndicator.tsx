@@ -41,8 +41,8 @@ export function AdminModeIndicator() {
         </p>
       )}
       {placementMode === 'repositioning' && (
-        <p className="pointer-events-none mx-auto w-full max-w-3xl rounded-xl border border-sky-bright/25 bg-sky/15 px-4 py-2 text-center text-sm text-sky-100 backdrop-blur-md">
-          Clique na nova posição do tópico.
+        <p className="pointer-events-none mx-auto w-full max-w-3xl rounded-xl border border-amber-300/30 bg-amber-400/15 px-4 py-2 text-center text-sm text-amber-100 backdrop-blur-md">
+          Segure e arraste o tópico amarelo; solte o botão para confirmar a nova posição.
         </p>
       )}
     </div>

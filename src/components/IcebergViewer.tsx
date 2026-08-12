@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { TransformComponent, TransformWrapper } from 'react-zoom-pan-pinch'
 import type { IcebergTopic } from '../types/iceberg'
 import { useEditMode } from '../contexts/EditModeContext'
@@ -24,23 +24,54 @@ export function IcebergViewer({
   const wrapperRef = useRef<HTMLDivElement>(null)
   const imageRef = useRef<HTMLImageElement>(null)
   const [imageReady, setImageReady] = useState(false)
+  const [dragCoords, setDragCoords] = useState<{ x: number; y: number } | null>(null)
 
-  const selecting = placementMode === 'placing' || placementMode === 'repositioning'
+  const placing = placementMode === 'placing'
+  const repositioning = placementMode === 'repositioning'
+  const selecting = placing || repositioning
+  const isDragging = dragCoords != null
 
-  const handleImagePointer = useCallback(
-    (clientX: number, clientY: number) => {
-      const img = imageRef.current
-      if (!img || !selecting) return
+  useEffect(() => {
+    if (!repositioning) setDragCoords(null)
+  }, [repositioning])
 
-      const rect = img.getBoundingClientRect()
-      if (rect.width <= 0 || rect.height <= 0) return
+  const coordsFromPointer = useCallback((clientX: number, clientY: number) => {
+    const img = imageRef.current
+    if (!img) return null
 
-      const x = Math.min(1, Math.max(0, (clientX - rect.left) / rect.width))
-      const y = Math.min(1, Math.max(0, (clientY - rect.top) / rect.height))
-      onPlaceCoordinate({ x, y })
-    },
-    [onPlaceCoordinate, selecting],
-  )
+    const rect = img.getBoundingClientRect()
+    if (rect.width <= 0 || rect.height <= 0) return null
+
+    return {
+      x: Math.min(1, Math.max(0, (clientX - rect.left) / rect.width)),
+      y: Math.min(1, Math.max(0, (clientY - rect.top) / rect.height)),
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!isDragging) return
+
+    const onMove = (e: PointerEvent) => {
+      const coords = coordsFromPointer(e.clientX, e.clientY)
+      if (coords) setDragCoords(coords)
+    }
+
+    const onUp = (e: PointerEvent) => {
+      const coords = coordsFromPointer(e.clientX, e.clientY)
+      setDragCoords(null)
+      if (coords) onPlaceCoordinate(coords)
+    }
+
+    window.addEventListener('pointermove', onMove)
+    window.addEventListener('pointerup', onUp)
+    window.addEventListener('pointercancel', onUp)
+
+    return () => {
+      window.removeEventListener('pointermove', onMove)
+      window.removeEventListener('pointerup', onUp)
+      window.removeEventListener('pointercancel', onUp)
+    }
+  }, [isDragging, coordsFromPointer, onPlaceCoordinate])
 
   function toggleFullscreen() {
     const el = wrapperRef.current
@@ -74,7 +105,7 @@ export function IcebergViewer({
         limitToBounds={false}
         doubleClick={{ disabled: true }}
         wheel={{ step: 0.12 }}
-        panning={{ disabled: selecting, velocityDisabled: true }}
+        panning={{ disabled: selecting || isDragging, velocityDisabled: true }}
         pinch={{ disabled: false }}
       >
         {({ zoomIn, zoomOut, resetTransform }) => (
@@ -86,13 +117,18 @@ export function IcebergViewer({
               <div
                 className={[
                   'relative inline-block max-h-full max-w-full',
-                  selecting ? 'cursor-crosshair' : 'cursor-grab active:cursor-grabbing',
+                  placing
+                    ? 'cursor-crosshair'
+                    : isDragging
+                      ? 'cursor-grabbing'
+                      : 'cursor-grab active:cursor-grabbing',
                 ].join(' ')}
                 onClick={(e) => {
-                  if (!selecting) return
+                  if (!placing) return
                   e.preventDefault()
                   e.stopPropagation()
-                  handleImagePointer(e.clientX, e.clientY)
+                  const coords = coordsFromPointer(e.clientX, e.clientY)
+                  if (coords) onPlaceCoordinate(coords)
                 }}
               >
                 <img
@@ -104,18 +140,37 @@ export function IcebergViewer({
                   className="block h-auto max-h-[calc(100dvh-4rem)] w-auto max-w-[100vw] select-none"
                 />
 
-                {topics.map((topic) => (
-                  <IcebergHotspot
-                    key={topic.id}
-                    topic={topic}
-                    editMode={editMode}
-                    selected={selectedTopicId === topic.id}
-                    onSelect={(t) => {
-                      if (selecting) return
-                      onTopicClick(t)
-                    }}
-                  />
-                ))}
+                {topics.map((topic) => {
+                  const canDrag = repositioning && selectedTopicId === topic.id
+                  const topicDragging = canDrag && isDragging
+
+                  return (
+                    <IcebergHotspot
+                      key={topic.id}
+                      topic={topic}
+                      editMode={editMode}
+                      selected={selectedTopicId === topic.id}
+                      dragging={topicDragging}
+                      position={topicDragging ? dragCoords : undefined}
+                      onSelect={(t) => {
+                        if (selecting) return
+                        onTopicClick(t)
+                      }}
+                      onDragStart={
+                        canDrag
+                          ? (clientX, clientY) => {
+                              const coords =
+                                coordsFromPointer(clientX, clientY) ?? {
+                                  x: topic.x,
+                                  y: topic.y,
+                                }
+                              setDragCoords(coords)
+                            }
+                          : undefined
+                      }
+                    />
+                  )
+                })}
               </div>
             </TransformComponent>
 

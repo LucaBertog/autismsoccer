@@ -163,7 +163,7 @@ export function IcebergPage() {
     setEditor({ open: false })
     setRepositionTopicId(id)
     setPlacementMode('repositioning')
-    pushToast('Clique na nova posição do tópico.', 'info')
+    pushToast('Segure e arraste o tópico amarelo; solte para salvar a posição.', 'info')
   }
 
   return (

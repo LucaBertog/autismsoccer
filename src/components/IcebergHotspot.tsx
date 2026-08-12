@@ -7,34 +7,56 @@ type IcebergHotspotProps = {
   topic: IcebergTopic
   editMode: boolean
   selected?: boolean
+  dragging?: boolean
+  position?: { x: number; y: number }
   onSelect: (topic: IcebergTopic) => void
+  onDragStart?: (clientX: number, clientY: number) => void
 }
 
 export function IcebergHotspot({
   topic,
   editMode,
   selected = false,
+  dragging = false,
+  position,
   onSelect,
+  onDragStart,
 }: IcebergHotspotProps) {
+  const x = position?.x ?? topic.x
+  const y = position?.y ?? topic.y
+
   return (
     <button
       type="button"
       aria-label={`Abrir tópico: ${topic.title}`}
       onClick={(e) => {
         e.stopPropagation()
+        if (onDragStart) return
         onSelect(topic)
       }}
+      onPointerDown={(e) => {
+        if (!onDragStart || e.button !== 0) return
+        e.preventDefault()
+        e.stopPropagation()
+        onDragStart(e.clientX, e.clientY)
+      }}
       style={{
-        left: `${topic.x * 100}%`,
-        top: `${topic.y * 100}%`,
+        left: `${x * 100}%`,
+        top: `${y * 100}%`,
         width: `${HITBOX_W * 4}%`,
         height: `${HITBOX_H * 4}%`,
         minWidth: 44,
         minHeight: 16,
       }}
       className={[
-        'absolute -translate-x-1/2 -translate-y-1/2 rounded-md transition',
-        'focus-ring cursor-pointer',
+        'absolute -translate-x-1/2 -translate-y-1/2 rounded-md',
+        dragging ? '' : 'transition',
+        'focus-ring',
+        onDragStart
+          ? dragging
+            ? 'pointer-events-none z-20 cursor-grabbing'
+            : 'z-20 cursor-grab'
+          : 'cursor-pointer',
         editMode
           ? selected
             ? 'border border-amber-300/80 bg-amber-300/25 shadow-[0_0_16px_rgba(251,191,36,0.45)]'
