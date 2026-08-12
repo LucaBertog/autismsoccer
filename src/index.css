@@ -107,6 +107,10 @@
     border: 1px solid rgba(56, 189, 248, 0.18);
   }
 
+  .topic-description-content img {
+    cursor: zoom-in;
+  }
+
   .topic-description-editor .tiptap ul,
   .topic-description-content ul,
   .topic-description-editor .tiptap ol,
