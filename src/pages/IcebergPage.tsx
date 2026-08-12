@@ -222,6 +222,11 @@ export function IcebergPage() {
       />
 
       <TopicEditor
+        key={
+          editor.open
+            ? `${editor.mode}-${editor.mode === 'edit' ? editor.topic!.id : 'new'}-${editor.coords.x}-${editor.coords.y}`
+            : 'closed'
+        }
         open={editor.open}
         mode={editor.open ? editor.mode : 'create'}
         initial={

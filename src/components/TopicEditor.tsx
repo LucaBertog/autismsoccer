@@ -1,11 +1,13 @@
 import { useEffect, useId, useState, type FormEvent } from 'react'
 import { X } from 'lucide-react'
+import { normalizeDescriptionForSave } from '../lib/descriptionHtml'
 import type { IcebergTopic } from '../types/iceberg'
+import { TopicDescriptionEditor } from './TopicDescriptionEditor'
 
 type TopicEditorProps = {
   open: boolean
   mode: 'create' | 'edit'
-  initial?: Pick<IcebergTopic, 'title' | 'description' | 'x' | 'y'> | null
+  initial?: Pick<IcebergTopic, 'title' | 'description' | 'x' | 'y'> & { id?: string } | null
   coordinates: { x: number; y: number } | null
   submitting?: boolean
   onClose: () => void
@@ -26,18 +28,10 @@ export function TopicEditor({
   onStartReposition,
 }: TopicEditorProps) {
   const titleId = useId()
-  const [title, setTitle] = useState('')
-  const [description, setDescription] = useState('')
+  const [title, setTitle] = useState(initial?.title ?? '')
+  const [description, setDescription] = useState(initial?.description ?? '')
   const [confirmDelete, setConfirmDelete] = useState(false)
   const [error, setError] = useState<string | null>(null)
-
-  useEffect(() => {
-    if (!open) return
-    setTitle(initial?.title ?? '')
-    setDescription(initial?.description ?? '')
-    setConfirmDelete(false)
-    setError(null)
-  }, [open, initial])
 
   useEffect(() => {
     if (!open) return
@@ -59,8 +53,10 @@ export function TopicEditor({
       return
     }
     setError(null)
-    await onSave({ title: title.trim(), description })
+    await onSave({ title: title.trim(), description: normalizeDescriptionForSave(description) })
   }
+
+  const editorKey = `${mode}-${initial?.id ?? 'new'}-${coordinates?.x ?? initial?.x ?? 0}-${coordinates?.y ?? initial?.y ?? 0}`
 
   return (
     <div className="fixed inset-0 z-[65] flex items-end justify-center p-0 sm:items-center sm:p-6">
@@ -109,16 +105,17 @@ export function TopicEditor({
             />
           </label>
 
-          <label className="block space-y-1.5 text-sm">
+          <div className="block space-y-1.5 text-sm">
             <span className="text-mist">Descrição</span>
-            <textarea
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              rows={8}
-              className="focus-ring w-full resize-y rounded-xl border border-sky-bright/20 bg-ink/60 px-3 py-2.5 text-slate-100 leading-relaxed"
-              placeholder="Contexto, pessoas envolvidas, lore…"
+            <TopicDescriptionEditor
+              key={editorKey}
+              editorKey={editorKey}
+              content={description}
+              onChange={setDescription}
+              onError={setError}
+              disabled={submitting}
             />
-          </label>
+          </div>
 
           {error && (
             <p className="rounded-lg border border-rose-400/30 bg-rose-500/10 px-3 py-2 text-sm text-rose-100">

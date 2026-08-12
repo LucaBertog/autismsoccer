@@ -1,5 +1,6 @@
-import { useEffect, useId, useRef } from 'react'
+import { useEffect, useId, useMemo, useRef } from 'react'
 import { X } from 'lucide-react'
+import { descriptionToDisplayHtml, isDescriptionEmpty } from '../lib/descriptionHtml'
 import type { IcebergTopic } from '../types/iceberg'
 
 type TopicModalProps = {
@@ -27,9 +28,13 @@ export function TopicModal({ topic, open, onClose }: TopicModalProps) {
     return () => window.removeEventListener('keydown', onKey)
   }, [open, onClose])
 
-  if (!open || !topic) return null
+  const displayHtml = useMemo(
+    () => (topic ? descriptionToDisplayHtml(topic.description) : ''),
+    [topic?.description],
+  )
+  const hasDescription = topic ? !isDescriptionEmpty(topic.description) : false
 
-  const hasDescription = topic.description.trim().length > 0
+  if (!open || !topic) return null
 
   return (
     <div className="fixed inset-0 z-[60] flex items-end justify-center p-0 sm:items-center sm:p-6">
@@ -65,9 +70,10 @@ export function TopicModal({ topic, open, onClose }: TopicModalProps) {
 
         <div className="overflow-y-auto px-5 py-5 sm:px-6">
           {hasDescription ? (
-            <p className="whitespace-pre-wrap text-[15px] leading-relaxed text-mist">
-              {topic.description}
-            </p>
+            <div
+              className="topic-description-content text-[15px] leading-relaxed text-mist"
+              dangerouslySetInnerHTML={{ __html: displayHtml }}
+            />
           ) : (
             <p className="text-sm italic text-fog/80">Ainda sem detalhes registrados.</p>
           )}

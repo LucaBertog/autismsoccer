@@ -78,4 +78,79 @@
     outline: 2px solid rgba(56, 189, 248, 0.8);
     outline-offset: 2px;
   }
+
+  .topic-description-editor .tiptap {
+    min-height: 12rem;
+    max-height: 20rem;
+    overflow-y: auto;
+    padding: 0.75rem;
+    color: #e2e8f0;
+    line-height: 1.65;
+    outline: none;
+  }
+
+  .topic-description-editor .tiptap p.is-editor-empty:first-child::before {
+    color: rgba(148, 163, 184, 0.65);
+    content: attr(data-placeholder);
+    float: left;
+    height: 0;
+    pointer-events: none;
+  }
+
+  .topic-description-editor .tiptap img,
+  .topic-description-content img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    margin: 0.75rem 0;
+    border-radius: 0.75rem;
+    border: 1px solid rgba(56, 189, 248, 0.18);
+  }
+
+  .topic-description-editor .tiptap ul,
+  .topic-description-content ul,
+  .topic-description-editor .tiptap ol,
+  .topic-description-content ol {
+    margin: 0.5rem 0;
+    padding-left: 1.25rem;
+  }
+
+  .topic-description-editor .tiptap h2,
+  .topic-description-content h2,
+  .topic-description-editor .tiptap h3,
+  .topic-description-content h3 {
+    margin: 0.75rem 0 0.35rem;
+    font-family: var(--font-display);
+    font-weight: 600;
+    color: #f8fafc;
+  }
+
+  .topic-description-editor .tiptap h2,
+  .topic-description-content h2 {
+    font-size: 1.125rem;
+  }
+
+  .topic-description-editor .tiptap h3,
+  .topic-description-content h3 {
+    font-size: 1rem;
+  }
+
+  .topic-description-editor .tiptap blockquote,
+  .topic-description-content blockquote {
+    margin: 0.5rem 0;
+    padding-left: 0.75rem;
+    border-left: 3px solid rgba(56, 189, 248, 0.35);
+    color: #cbd5e1;
+  }
+
+  .topic-description-editor .tiptap a,
+  .topic-description-content a {
+    color: #38bdf8;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  .topic-description-content p + p {
+    margin-top: 0.65rem;
+  }
 }

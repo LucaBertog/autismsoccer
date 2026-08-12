@@ -27,8 +27,8 @@ export function IcebergHotspot({
       style={{
         left: `${topic.x * 100}%`,
         top: `${topic.y * 100}%`,
-        width: `${HITBOX_W * 100}%`,
-        height: `${HITBOX_H * 100}%`,
+        width: `${HITBOX_W * 4}%`,
+        height: `${HITBOX_H * 4}%`,
         minWidth: 28,
         minHeight: 16,
       }}

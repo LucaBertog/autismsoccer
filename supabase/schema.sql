@@ -61,3 +61,33 @@ create trigger iceberg_topics_set_updated_at
   before update on public.iceberg_topics
   for each row
   execute function public.set_updated_at();
+
+-- Imagens das descrições dos tópicos (HTML rico)
+insert into storage.buckets (id, name, public)
+values ('topic-images', 'topic-images', true)
+on conflict (id) do nothing;
+
+create policy "Public can view topic images"
+  on storage.objects
+  for select
+  to anon, authenticated
+  using (bucket_id = 'topic-images');
+
+create policy "Authenticated can upload topic images"
+  on storage.objects
+  for insert
+  to authenticated
+  with check (bucket_id = 'topic-images');
+
+create policy "Authenticated can update topic images"
+  on storage.objects
+  for update
+  to authenticated
+  using (bucket_id = 'topic-images')
+  with check (bucket_id = 'topic-images');
+
+create policy "Authenticated can delete topic images"
+  on storage.objects
+  for delete
+  to authenticated
+  using (bucket_id = 'topic-images');

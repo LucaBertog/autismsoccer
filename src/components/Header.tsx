@@ -45,15 +45,9 @@ export function Header({
     <>
       <header className="glass fixed inset-x-0 top-0 z-50 border-b border-sky-bright/10">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between gap-3 px-4 sm:px-6">
-          <div className="flex min-w-0 items-center gap-3">
-            <div
-              className="grid h-9 w-9 shrink-0 place-items-center rounded-xl border border-sky-bright/25 bg-sky/10 shadow-[0_0_18px_rgba(14,165,233,0.25)]"
-              aria-hidden
-            >
-              <span className="font-display text-sm font-bold text-sky-bright">AS</span>
-            </div>
+          <div className="flex min-w-0 items-center">
             <span className="truncate font-display text-sm font-semibold tracking-wide text-white sm:text-base">
-              Autism Soccer
+              Autism Soccer - O Site
             </span>
           </div>
 
