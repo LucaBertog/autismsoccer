@@ -1,37 +1,51 @@
-import { useEffect, useId, useState, type FormEvent } from 'react'
-import { X } from 'lucide-react'
+import { useEffect, useId, useRef, useState, type FormEvent } from 'react'
+import { ImagePlus, X } from 'lucide-react'
+import { ICEBERG_LAYERS, LAYER_COPY, toLayer, type IcebergLayer } from '../lib/icebergLayers'
 import { normalizeDescriptionForSave } from '../lib/descriptionHtml'
+import { uploadTopicImage } from '../services/topicImages'
 import type { IcebergTopic } from '../types/iceberg'
 import { TopicDescriptionEditor } from './TopicDescriptionEditor'
+
+export type TopicEditorSavePayload = {
+  title: string
+  subtitle: string | null
+  description: string
+  layer: IcebergLayer
+  main_image_url: string | null
+}
 
 type TopicEditorProps = {
   open: boolean
   mode: 'create' | 'edit'
-  initial?: Pick<IcebergTopic, 'title' | 'description' | 'x' | 'y'> & { id?: string } | null
-  coordinates: { x: number; y: number } | null
+  initial?: IcebergTopic | null
   submitting?: boolean
   onClose: () => void
-  onSave: (data: { title: string; description: string }) => Promise<void> | void
+  onSave: (data: TopicEditorSavePayload) => Promise<void> | void
   onDelete?: () => Promise<void> | void
-  onStartReposition?: () => void
 }
 
 export function TopicEditor({
   open,
   mode,
   initial,
-  coordinates,
   submitting = false,
   onClose,
   onSave,
   onDelete,
-  onStartReposition,
 }: TopicEditorProps) {
   const titleId = useId()
+  const fileId = useId()
+  const fileRef = useRef<HTMLInputElement>(null)
   const [title, setTitle] = useState(initial?.title ?? '')
+  const [subtitle, setSubtitle] = useState(initial?.subtitle ?? '')
   const [description, setDescription] = useState(initial?.description ?? '')
+  const [layer, setLayer] = useState<IcebergLayer>(initial?.layer ?? 1)
+  const [imageUrl, setImageUrl] = useState<string | null>(initial?.main_image_url ?? null)
+  const [imageFile, setImageFile] = useState<File | null>(null)
+  const [previewUrl, setPreviewUrl] = useState<string | null>(initial?.main_image_url ?? null)
   const [confirmDelete, setConfirmDelete] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [uploading, setUploading] = useState(false)
 
   useEffect(() => {
     if (!open) return
@@ -42,9 +56,24 @@ export function TopicEditor({
     return () => window.removeEventListener('keydown', onKey)
   }, [open, onClose])
 
+  useEffect(() => {
+    return () => {
+      if (previewUrl?.startsWith('blob:')) URL.revokeObjectURL(previewUrl)
+    }
+  }, [previewUrl])
+
   if (!open) return null
 
-  const coords = coordinates ?? (initial ? { x: initial.x, y: initial.y } : null)
+  function handleImageChange(file: File | null) {
+    if (previewUrl?.startsWith('blob:')) URL.revokeObjectURL(previewUrl)
+    setImageFile(file)
+    if (file) {
+      setPreviewUrl(URL.createObjectURL(file))
+      return
+    }
+    setPreviewUrl(null)
+    setImageUrl(null)
+  }
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
@@ -53,10 +82,28 @@ export function TopicEditor({
       return
     }
     setError(null)
-    await onSave({ title: title.trim(), description: normalizeDescriptionForSave(description) })
+    setUploading(true)
+    try {
+      let nextImage = imageUrl
+      if (imageFile) {
+        nextImage = await uploadTopicImage(imageFile)
+      }
+      await onSave({
+        title: title.trim(),
+        subtitle: subtitle.trim() || null,
+        description: normalizeDescriptionForSave(description),
+        layer,
+        main_image_url: nextImage,
+      })
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Falha ao enviar imagem.')
+    } finally {
+      setUploading(false)
+    }
   }
 
-  const editorKey = `${mode}-${initial?.id ?? 'new'}-${coordinates?.x ?? initial?.x ?? 0}-${coordinates?.y ?? initial?.y ?? 0}`
+  const editorKey = `${mode}-${initial?.id ?? 'new'}`
+  const busy = submitting || uploading
 
   return (
     <div className="fixed inset-0 z-[65] flex items-end justify-center p-0 sm:items-center sm:p-6">
@@ -73,16 +120,9 @@ export function TopicEditor({
         className="glass-strong relative z-10 flex max-h-[90dvh] w-full max-w-lg flex-col rounded-t-3xl sm:rounded-3xl"
       >
         <div className="flex items-start justify-between gap-3 border-b border-white/5 px-5 py-4">
-          <div>
-            <h2 id={titleId} className="font-display text-lg font-semibold text-white">
-              {mode === 'create' ? 'Novo tópico' : 'Editar tópico'}
-            </h2>
-            {coords && (
-              <p className="mt-1 font-mono text-xs text-fog">
-                x: {coords.x.toFixed(3)} · y: {coords.y.toFixed(3)}
-              </p>
-            )}
-          </div>
+          <h2 id={titleId} className="font-display text-lg font-semibold text-white">
+            {mode === 'create' ? 'Novo tópico' : 'Editar tópico'}
+          </h2>
           <button
             type="button"
             onClick={onClose}
@@ -101,9 +141,83 @@ export function TopicEditor({
               onChange={(e) => setTitle(e.target.value)}
               required
               className="focus-ring w-full rounded-xl border border-sky-bright/20 bg-ink/60 px-3 py-2.5 text-slate-100"
-              placeholder="Nome do tópico na imagem"
+              placeholder="Nome do tópico"
             />
           </label>
+
+          <label className="block space-y-1.5 text-sm">
+            <span className="text-mist">
+              Subtítulo <span className="text-fog">(opcional)</span>
+            </span>
+            <input
+              value={subtitle}
+              onChange={(e) => setSubtitle(e.target.value)}
+              className="focus-ring w-full rounded-xl border border-sky-bright/20 bg-ink/60 px-3 py-2.5 text-slate-100"
+              placeholder="Linha curta de contexto"
+            />
+          </label>
+
+          <label className="block space-y-1.5 text-sm">
+            <span className="text-mist">Camada</span>
+            <select
+              value={layer}
+              onChange={(e) => setLayer(toLayer(e.target.value))}
+              className="focus-ring w-full rounded-xl border border-sky-bright/20 bg-ink/60 px-3 py-2.5 text-slate-100 [color-scheme:dark]"
+            >
+              {ICEBERG_LAYERS.map((value) => (
+                <option key={value} value={value}>
+                  {LAYER_COPY[value].title} — {LAYER_COPY[value].hint}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <div className="block space-y-1.5 text-sm">
+            <span className="text-mist">
+              Imagem principal <span className="text-fog">(opcional)</span>
+            </span>
+            {previewUrl ? (
+              <div className="overflow-hidden rounded-xl border border-sky-bright/20">
+                <img src={previewUrl} alt="Prévia da imagem principal" className="max-h-44 w-full object-cover" />
+                <div className="flex gap-2 border-t border-white/5 bg-ink/50 p-2">
+                  <button
+                    type="button"
+                    onClick={() => fileRef.current?.click()}
+                    disabled={busy}
+                    className="focus-ring flex-1 rounded-lg px-3 py-1.5 text-xs text-sky-100 hover:bg-white/5"
+                  >
+                    Substituir
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleImageChange(null)}
+                    disabled={busy}
+                    className="focus-ring flex-1 rounded-lg px-3 py-1.5 text-xs text-rose-200 hover:bg-rose-500/10"
+                  >
+                    Remover
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={() => fileRef.current?.click()}
+                disabled={busy}
+                className="focus-ring flex w-full items-center justify-center gap-2 rounded-xl border border-dashed border-sky-bright/25 bg-ink/40 px-3 py-6 text-sm text-fog hover:bg-ink/60 hover:text-mist"
+              >
+                <ImagePlus size={18} aria-hidden />
+                Selecionar imagem
+              </button>
+            )}
+            <input
+              ref={fileRef}
+              id={fileId}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={(e) => handleImageChange(e.target.files?.[0] ?? null)}
+            />
+          </div>
 
           <div className="block space-y-1.5 text-sm">
             <span className="text-mist">Descrição</span>
@@ -113,7 +227,7 @@ export function TopicEditor({
               content={description}
               onChange={setDescription}
               onError={setError}
-              disabled={submitting}
+              disabled={busy}
             />
           </div>
 
@@ -126,29 +240,18 @@ export function TopicEditor({
           <div className="flex flex-col gap-2 pt-1">
             <button
               type="submit"
-              disabled={submitting}
+              disabled={busy}
               className="focus-ring rounded-xl bg-sky/90 px-4 py-2.5 text-sm font-medium text-ink shadow-[0_0_24px_rgba(14,165,233,0.3)] hover:bg-sky disabled:opacity-60"
             >
-              {submitting ? 'Salvando…' : 'Salvar'}
+              {uploading ? 'Enviando imagem…' : submitting ? 'Salvando…' : 'Salvar'}
             </button>
-
-            {mode === 'edit' && onStartReposition && (
-              <button
-                type="button"
-                disabled={submitting}
-                onClick={onStartReposition}
-                className="focus-ring rounded-xl border border-sky-bright/30 bg-sky/10 px-4 py-2.5 text-sm text-sky-100 hover:bg-sky/20"
-              >
-                Reposicionar
-              </button>
-            )}
 
             {mode === 'edit' && onDelete && (
               <div className="pt-2">
                 {!confirmDelete ? (
                   <button
                     type="button"
-                    disabled={submitting}
+                    disabled={busy}
                     onClick={() => setConfirmDelete(true)}
                     className="focus-ring w-full rounded-xl px-4 py-2 text-sm text-rose-300/80 hover:bg-rose-500/10 hover:text-rose-200"
                   >
@@ -162,7 +265,7 @@ export function TopicEditor({
                     <div className="flex gap-2">
                       <button
                         type="button"
-                        disabled={submitting}
+                        disabled={busy}
                         onClick={onDelete}
                         className="focus-ring flex-1 rounded-lg bg-rose-500/80 px-3 py-2 text-sm text-white hover:bg-rose-500"
                       >

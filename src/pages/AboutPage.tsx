@@ -19,7 +19,7 @@ export function AboutPage() {
         </h1>
         <p className="relative mt-4 max-w-xl text-base leading-relaxed text-mist">
           Este site reúne histórias, memes, situações e lore do grupo Autism Soccer. O iceberg
-          interativo é o ponto central — um mapa vivo dos acontecimentos da panelinha.
+          em camadas é o ponto central — da superfície ao que quase ninguém vê.
         </p>
         <p className="relative mt-4 max-w-xl text-sm leading-relaxed text-fog">
           Conteúdo provisório. Atualize este texto quando quiser contar mais sobre o grupo.

@@ -1,37 +1,12 @@
 import { NavLink } from 'react-router-dom'
-import { LogOut, Pencil } from 'lucide-react'
+import { LogIn, LogOut } from 'lucide-react'
 import { useState } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import { LoginModal } from './LoginModal'
 
-type HeaderProps = {
-  editMode?: boolean
-  onToggleEditMode?: () => void
-  onEnterEditMode?: () => void
-  onExitEditMode?: () => void
-}
-
-export function Header({
-  editMode = false,
-  onToggleEditMode,
-  onEnterEditMode,
-  onExitEditMode,
-}: HeaderProps) {
+export function Header() {
   const { user, signOut, loading } = useAuth()
   const [loginOpen, setLoginOpen] = useState(false)
-
-  function handleEditClick() {
-    if (user) {
-      onToggleEditMode?.()
-      return
-    }
-    setLoginOpen(true)
-  }
-
-  async function handleSignOut() {
-    onExitEditMode?.()
-    await signOut()
-  }
 
   const linkClass = ({ isActive }: { isActive: boolean }) =>
     [
@@ -70,44 +45,33 @@ export function Header({
               </NavLink>
             </nav>
 
-            {user && (
+            {user ? (
               <button
                 type="button"
-                onClick={handleSignOut}
-                className="focus-ring hidden rounded-lg p-2 text-fog hover:bg-white/5 hover:text-white sm:inline-flex"
+                onClick={() => void signOut()}
+                className="focus-ring inline-flex items-center gap-2 rounded-xl border border-white/15 bg-white/5 px-3 py-2 text-sm text-mist hover:bg-white/10 hover:text-white"
                 aria-label="Sair"
                 title="Sair"
               >
-                <LogOut size={16} />
+                <LogOut size={15} aria-hidden />
+                <span className="hidden sm:inline">Sair</span>
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setLoginOpen(true)}
+                disabled={loading}
+                className="focus-ring inline-flex items-center gap-2 rounded-xl border border-sky-bright/30 bg-sky/15 px-3 py-2 text-sm font-medium text-sky-100 shadow-[0_0_20px_rgba(14,165,233,0.2)] hover:bg-sky/25"
+              >
+                <LogIn size={15} aria-hidden />
+                <span>Entrar</span>
               </button>
             )}
-
-            <button
-              type="button"
-              onClick={handleEditClick}
-              disabled={loading}
-              className={[
-                'focus-ring inline-flex items-center gap-2 rounded-xl border px-3 py-2 text-sm font-medium transition',
-                editMode
-                  ? 'border-amber-300/40 bg-amber-400/15 text-amber-100 shadow-[0_0_20px_rgba(251,191,36,0.2)]'
-                  : 'border-sky-bright/30 bg-sky/15 text-sky-100 shadow-[0_0_20px_rgba(14,165,233,0.2)] hover:bg-sky/25',
-              ].join(' ')}
-            >
-              <Pencil size={15} aria-hidden />
-              <span className="hidden sm:inline">
-                {editMode ? 'Sair da edição' : 'Editar Iceberg'}
-              </span>
-              <span className="sm:hidden">{editMode ? 'Sair' : 'Editar'}</span>
-            </button>
           </div>
         </div>
       </header>
 
-      <LoginModal
-        open={loginOpen}
-        onClose={() => setLoginOpen(false)}
-        onSuccess={() => onEnterEditMode?.()}
-      />
+      <LoginModal open={loginOpen} onClose={() => setLoginOpen(false)} />
     </>
   )
 }

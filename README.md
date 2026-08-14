@@ -6,8 +6,7 @@ Site dedicado ao iceberg interativo do grupo **Autism Soccer** (Discord).
 
 - React + TypeScript + Vite
 - Tailwind CSS
-- react-zoom-pan-pinch
-- Supabase (Postgres + Auth + RLS)
+- Supabase (Postgres + Auth + Storage + RLS)
 
 ## Como rodar
 
@@ -26,29 +25,30 @@ Abra o endereço indicado no terminal (geralmente `http://localhost:5173`).
    - Project URL → `VITE_SUPABASE_URL`
    - `anon` `public` key → `VITE_SUPABASE_ANON_KEY`
 3. Cole os valores no arquivo `.env`.
-4. No **SQL Editor**, execute o conteúdo de `supabase/schema.sql` (inclui tabela, RLS e bucket `topic-images` para imagens nas descrições).
+4. No **SQL Editor**:
+   - Projeto novo: execute `supabase/schema.sql`.
+   - Projeto já existente: execute `supabase/migrations/20260814_topic_layers.sql` (não apaga tópicos).
 5. Em **Authentication → Users**, crie o usuário administrador (e-mail + senha).
 6. Reinicie o `npm run dev`.
+
+A migration incremental adiciona `subtitle`, `main_image_url` e `layer` (1–8). Tópicos antigos recebem `layer = 1`. Os campos `x` e `y` ficam deprecated/nullable e não são mais usados na interface.
 
 ### Segurança
 
 - Visitantes (anon) só leem tópicos.
-- Criar / editar / excluir exige login autenticado (políticas RLS).
-- O botão **Editar Iceberg** abre o login; sem sessão válida a API rejeita escritas.
+- Criar / editar / excluir / upload exige login autenticado (políticas RLS).
+- O botão **Entrar** abre o login; sem sessão válida a API rejeita escritas.
+- Imagens vão para o bucket público `topic-images`; só usuários autenticados fazem upload.
 
 Não use a `service_role` key no frontend.
 
-**Projeto já existente?** Se você já rodou o `schema.sql` antes, execute no SQL Editor apenas o trecho final do arquivo (bucket `topic-images` e políticas de Storage).
+## Uso
 
-## Uso do editor
-
-1. Clique em **Editar Iceberg** e entre com a conta admin.
-2. **Adicionar tópico** → clique sobre o texto vermelho na imagem → preencha título/descrição → Salvar.
-3. A descrição aceita formatação (negrito, listas) e **imagens coladas com Ctrl+V** diretamente no corpo do texto.
-4. Clique em um hotspot existente para editar, reposicionar ou excluir.
-5. Em **Reposicionar**, clique na nova posição na imagem.
-
-Coordenadas são normalizadas (`0–1`) em relação à imagem, então acompanham zoom, pan e resize.
+1. Role o iceberg pelas **8 camadas** (superfície → abismo).
+2. Clique em um tópico para abrir a página dedicada (`/topico/:id`).
+3. Use **Buscar tópico** para filtrar por título (e subtítulo).
+4. **Entrar** (admin) → botão flutuante **+** para criar tópicos.
+5. Na página do tópico, **Editar tópico** altera título, subtítulo, descrição, camada e imagem principal.
 
 ## Scripts
 
@@ -62,13 +62,15 @@ Coordenadas são normalizadas (`0–1`) em relação à imagem, então acompanha
 
 ```
 src/
-  components/   Header, IcebergViewer, hotspots, modais, editor
-  pages/        Iceberg, Sobre
-  services/     acesso aos tópicos (Supabase)
-  contexts/     auth e modo de edição
+  components/   Header, Iceberg parallax, editor, infobox, busca
+  pages/        Iceberg, tópico, Sobre
+  services/     tópicos e upload (Supabase)
+  contexts/     auth
   types/        tipagens do iceberg
 supabase/
-  schema.sql    tabela + RLS
+  schema.sql    tabela + RLS (instalação nova)
+  migrations/   alterações incrementais
 public/
-  iceberg.png   imagem original (não substituir)
+  iceberg-parallax.avif   fundo da experiência
+  iceberg.png             imagem original (não alterar, se existir)
 ```

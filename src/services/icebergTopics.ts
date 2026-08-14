@@ -1,3 +1,4 @@
+import { toLayer } from '../lib/icebergLayers'
 import { supabase, isSupabaseConfigured } from '../lib/supabase'
 import type { IcebergTopic, IcebergTopicInput, IcebergTopicUpdate } from '../types/iceberg'
 
@@ -10,13 +11,21 @@ function assertClient() {
   return supabase
 }
 
+function emptyToNull(value: string | null | undefined): string | null {
+  const trimmed = value?.trim() ?? ''
+  return trimmed.length > 0 ? trimmed : null
+}
+
 function mapRow(row: Record<string, unknown>): IcebergTopic {
   return {
     id: String(row.id),
     title: String(row.title ?? ''),
+    subtitle: emptyToNull(row.subtitle == null ? null : String(row.subtitle)),
     description: String(row.description ?? ''),
-    x: Number(row.x),
-    y: Number(row.y),
+    main_image_url: emptyToNull(
+      row.main_image_url == null ? null : String(row.main_image_url),
+    ),
+    layer: toLayer(row.layer),
     created_at: String(row.created_at),
     updated_at: String(row.updated_at),
   }
@@ -27,10 +36,25 @@ export async function listTopics(): Promise<IcebergTopic[]> {
   const { data, error } = await client
     .from('iceberg_topics')
     .select('*')
+    .order('layer', { ascending: true })
     .order('created_at', { ascending: true })
 
   if (error) throw new Error(error.message)
   return (data ?? []).map((row) => mapRow(row as Record<string, unknown>))
+}
+
+export const getTopics = listTopics
+
+export async function getTopicById(id: string): Promise<IcebergTopic | null> {
+  const client = assertClient()
+  const { data, error } = await client
+    .from('iceberg_topics')
+    .select('*')
+    .eq('id', id)
+    .maybeSingle()
+
+  if (error) throw new Error(error.message)
+  return data ? mapRow(data as Record<string, unknown>) : null
 }
 
 export async function createTopic(input: IcebergTopicInput): Promise<IcebergTopic> {
@@ -39,9 +63,13 @@ export async function createTopic(input: IcebergTopicInput): Promise<IcebergTopi
     .from('iceberg_topics')
     .insert({
       title: input.title.trim(),
+      subtitle: emptyToNull(input.subtitle),
       description: input.description,
-      x: input.x,
-      y: input.y,
+      main_image_url: emptyToNull(input.main_image_url),
+      layer: input.layer,
+      // x/y deprecated: enviados só para bancos que ainda exigem NOT NULL.
+      x: 0.5,
+      y: 0.5,
     })
     .select('*')
     .single()
@@ -60,9 +88,12 @@ export async function updateTopic(
   }
 
   if (input.title !== undefined) payload.title = input.title.trim()
+  if (input.subtitle !== undefined) payload.subtitle = emptyToNull(input.subtitle)
   if (input.description !== undefined) payload.description = input.description
-  if (input.x !== undefined) payload.x = input.x
-  if (input.y !== undefined) payload.y = input.y
+  if (input.main_image_url !== undefined) {
+    payload.main_image_url = emptyToNull(input.main_image_url)
+  }
+  if (input.layer !== undefined) payload.layer = input.layer
 
   const { data, error } = await client
     .from('iceberg_topics')

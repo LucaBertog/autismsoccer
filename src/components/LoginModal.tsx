@@ -5,7 +5,7 @@ import { useAuth } from '../contexts/AuthContext'
 type LoginModalProps = {
   open: boolean
   onClose: () => void
-  onSuccess: () => void
+  onSuccess?: () => void
 }
 
 export function LoginModal({ open, onClose, onSuccess }: LoginModalProps) {
@@ -41,7 +41,7 @@ export function LoginModal({ open, onClose, onSuccess }: LoginModalProps) {
     setSubmitting(true)
     try {
       await signIn(email.trim(), password)
-      onSuccess()
+      onSuccess?.()
       onClose()
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Falha ao entrar.')

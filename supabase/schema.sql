@@ -6,15 +6,22 @@ create extension if not exists "pgcrypto";
 create table if not exists public.iceberg_topics (
   id uuid primary key default gen_random_uuid(),
   title text not null,
+  subtitle text,
   description text not null default '',
-  x double precision not null check (x >= 0 and x <= 1),
-  y double precision not null check (y >= 0 and y <= 1),
+  main_image_url text,
+  layer integer not null default 1 check (layer >= 1 and layer <= 8),
+  -- x/y deprecated: mantidos por compatibilidade com registros antigos
+  x double precision check (x is null or (x >= 0 and x <= 1)),
+  y double precision check (y is null or (y >= 0 and y <= 1)),
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
 
 create index if not exists iceberg_topics_created_at_idx
   on public.iceberg_topics (created_at);
+
+create index if not exists iceberg_topics_layer_idx
+  on public.iceberg_topics (layer);
 
 alter table public.iceberg_topics enable row level security;
 
@@ -45,7 +52,6 @@ create policy "Authenticated can delete iceberg topics"
   to authenticated
   using (true);
 
--- Opcional: trigger para updated_at
 create or replace function public.set_updated_at()
 returns trigger
 language plpgsql
@@ -62,7 +68,6 @@ create trigger iceberg_topics_set_updated_at
   for each row
   execute function public.set_updated_at();
 
--- Imagens das descrições dos tópicos (HTML rico)
 insert into storage.buckets (id, name, public)
 values ('topic-images', 'topic-images', true)
 on conflict (id) do nothing;
