@@ -1,6 +1,7 @@
 import { useEffect, useId, useRef, useState, type FormEvent } from 'react'
 import { ImagePlus, X } from 'lucide-react'
 import { ICEBERG_LAYERS, LAYER_COPY, toLayer, type IcebergLayer } from '../lib/icebergLayers'
+import { LAYER_CLASS } from '../lib/layerClass'
 import { normalizeDescriptionForSave } from '../lib/descriptionHtml'
 import { uploadTopicImage } from '../services/topicImages'
 import type { IcebergTopic } from '../types/iceberg'
@@ -166,10 +167,11 @@ export function TopicEditor({
             >
               {ICEBERG_LAYERS.map((value) => (
                 <option key={value} value={value}>
-                  {LAYER_COPY[value].title} — {LAYER_COPY[value].hint}
+                  {LAYER_COPY[value].title} — {LAYER_CLASS[value].code} ({LAYER_COPY[value].hint})
                 </option>
               ))}
             </select>
+            <span className="block text-xs text-fog">{LAYER_CLASS[layer].label}</span>
           </label>
 
           <div className="block space-y-1.5 text-sm">

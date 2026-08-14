@@ -1,7 +1,9 @@
 import { Link } from 'react-router-dom'
 import { hashString } from '../lib/icebergLayers'
+import { getLayerClass } from '../lib/layerClass'
 import { saveIcebergReturn, topicAnchorId } from '../lib/icebergReturn'
 import type { IcebergTopic } from '../types/iceberg'
+import { LayerClassMark } from './LayerClassMark'
 
 type TopicLabelProps = {
   topic: IcebergTopic
@@ -20,16 +22,17 @@ const OFFSETS = [
 export function TopicLabel({ topic, dimmed = false }: TopicLabelProps) {
   const offset = OFFSETS[hashString(topic.id) % OFFSETS.length]
   const lift = (hashString(topic.id + topic.title) % 3) * 6
+  const layerClass = getLayerClass(topic.layer)
 
   return (
     <Link
       id={topicAnchorId(topic.id)}
       to={`/topico/${topic.id}`}
-      aria-label={`Abrir tópico: ${topic.title}`}
+      aria-label={`Abrir tópico ${topic.title}, classe ${layerClass.code}`}
       style={{ marginTop: lift }}
       onClick={() => saveIcebergReturn(topic.id)}
       className={[
-        'topic-label focus-ring inline-flex max-w-[min(100%,20rem)] items-center rounded-full border px-3.5 py-1.5 text-sm font-medium tracking-wide',
+        'topic-label focus-ring inline-flex max-w-[min(100%,22rem)] items-center gap-2 rounded-full border px-3 py-1.5 text-sm font-medium tracking-wide',
         'backdrop-blur-md transition duration-200',
         offset,
         dimmed
@@ -37,6 +40,7 @@ export function TopicLabel({ topic, dimmed = false }: TopicLabelProps) {
           : 'border-sky-bright/25 bg-ink/55 text-slate-100 shadow-[0_8px_24px_rgba(2,6,23,0.35)] hover:-translate-y-0.5 hover:border-sky-bright/55 hover:bg-sky/20 hover:text-white hover:shadow-[0_0_22px_rgba(56,189,248,0.28)]',
       ].join(' ')}
     >
+      <LayerClassMark layer={topic.layer} />
       <span className="truncate">{topic.title}</span>
     </Link>
   )

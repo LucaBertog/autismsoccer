@@ -1,5 +1,7 @@
 import { LAYER_COPY } from '../lib/icebergLayers'
+import { getLayerClass } from '../lib/layerClass'
 import type { IcebergTopic } from '../types/iceberg'
+import { LayerClassMark } from './LayerClassMark'
 
 type TopicInfoboxProps = {
   topic: IcebergTopic
@@ -8,6 +10,7 @@ type TopicInfoboxProps = {
 
 export function TopicInfobox({ topic, onEdit }: TopicInfoboxProps) {
   const copy = LAYER_COPY[topic.layer]
+  const layerClass = getLayerClass(topic.layer)
 
   return (
     <aside className="glass-strong overflow-hidden rounded-3xl lg:sticky lg:top-24">
@@ -27,7 +30,16 @@ export function TopicInfobox({ topic, onEdit }: TopicInfoboxProps) {
             <p className="mt-1 text-sm leading-relaxed text-fog">{topic.subtitle}</p>
           )}
         </div>
-        <dl className="border-t border-white/10 pt-3 text-sm">
+        <dl className="space-y-3 border-t border-white/10 pt-3 text-sm">
+          <div>
+            <div className="flex items-center justify-between gap-3">
+              <dt className="text-fog">Classe</dt>
+              <dd>
+                <LayerClassMark layer={topic.layer} size="md" showCode />
+              </dd>
+            </div>
+            <p className="mt-1 text-xs text-fog/90">{layerClass.label}</p>
+          </div>
           <div className="flex items-baseline justify-between gap-3">
             <dt className="text-fog">Camada do Iceberg</dt>
             <dd className="font-medium text-sky-bright">
