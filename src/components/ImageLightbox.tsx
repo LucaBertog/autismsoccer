@@ -1,4 +1,5 @@
 import { useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { X } from 'lucide-react'
 
 type ImageLightboxProps = {
@@ -10,42 +11,55 @@ type ImageLightboxProps = {
 export function ImageLightbox({ src, alt = '', onClose }: ImageLightboxProps) {
   useEffect(() => {
     if (!src) return
+
+    const html = document.documentElement
+    const { overflow: prevHtmlOverflow } = html.style
+    const { overflow: prevBodyOverflow } = document.body.style
+    html.style.overflow = 'hidden'
+    document.body.style.overflow = 'hidden'
+
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        e.stopPropagation()
-        onClose()
-      }
+      if (e.key !== 'Escape') return
+      e.preventDefault()
+      e.stopPropagation()
+      onClose()
     }
+
     window.addEventListener('keydown', onKey, true)
-    return () => window.removeEventListener('keydown', onKey, true)
+    return () => {
+      html.style.overflow = prevHtmlOverflow
+      document.body.style.overflow = prevBodyOverflow
+      window.removeEventListener('keydown', onKey, true)
+    }
   }, [src, onClose])
 
   if (!src) return null
 
-  return (
-    <div className="fixed inset-0 z-[80] flex items-center justify-center p-4 sm:p-8">
+  return createPortal(
+    <div
+      className="image-lightbox"
+      role="dialog"
+      aria-modal="true"
+      aria-label={alt ? `Imagem ampliada: ${alt}` : 'Imagem ampliada'}
+    >
       <button
         type="button"
-        className="modal-overlay absolute inset-0 bg-slate-950/85 backdrop-blur-sm"
+        className="image-lightbox-backdrop"
         aria-label="Fechar imagem"
         onClick={onClose}
       />
-      <div className="relative z-10 max-h-full max-w-full anim-scale-in">
+      <div className="image-lightbox-frame anim-scale-in">
         <button
           type="button"
           onClick={onClose}
-          className="focus-ring absolute -right-1 -top-1 z-20 rounded-lg bg-ink/80 p-1.5 text-fog hover:bg-ink hover:text-white sm:-right-2 sm:-top-2"
+          className="focus-ring image-lightbox-close"
           aria-label="Fechar"
         >
           <X size={18} />
         </button>
-        <img
-          src={src}
-          alt={alt}
-          className="max-h-[85dvh] max-w-[min(96vw,56rem)] rounded-xl border border-white/10 object-contain shadow-[0_24px_80px_rgba(0,0,0,0.55)]"
-          onClick={(e) => e.stopPropagation()}
-        />
+        <img src={src} alt={alt} className="image-lightbox-img" />
       </div>
-    </div>
+    </div>,
+    document.body,
   )
 }

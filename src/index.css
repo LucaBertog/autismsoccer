@@ -283,6 +283,70 @@
     animation: scale-in 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
   }
 
+  .image-lightbox {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: flex;
+    width: 100vw;
+    height: 100dvh;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+  }
+
+  @media (min-width: 640px) {
+    .image-lightbox {
+      padding: 2rem;
+    }
+  }
+
+  .image-lightbox-backdrop {
+    position: absolute;
+    inset: 0;
+    border: 0;
+    background: rgba(2, 6, 23, 0.88);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    animation: fade-in 0.28s ease both;
+  }
+
+  .image-lightbox-frame {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    max-height: 100%;
+    max-width: 100%;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .image-lightbox-img {
+    display: block;
+    max-width: min(96vw, 72rem);
+    max-height: 88dvh;
+    object-fit: contain;
+    border-radius: 0.75rem;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 24px 80px rgba(0, 0, 0, 0.55);
+  }
+
+  .image-lightbox-close {
+    position: absolute;
+    right: 0.35rem;
+    top: 0.35rem;
+    z-index: 2;
+    border-radius: 0.5rem;
+    background: rgba(2, 6, 23, 0.82);
+    padding: 0.35rem;
+    color: #94a3b8;
+  }
+
+  .image-lightbox-close:hover {
+    background: #020617;
+    color: #fff;
+  }
+
   .toast-in {
     animation: toast-in 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
   }
@@ -413,6 +477,7 @@
     .anim-scale-in,
     .modal-overlay,
     .modal-panel,
+    .image-lightbox-backdrop,
     .toast-in {
       animation: none !important;
       transition: none !important;

@@ -180,7 +180,13 @@ export function TopicEditor({
             </span>
             {previewUrl ? (
               <div className="overflow-hidden rounded-xl border border-sky-bright/20">
-                <img src={previewUrl} alt="Prévia da imagem principal" className="max-h-44 w-full object-cover" />
+                <div className="flex h-44 items-center justify-center bg-ink/80">
+                  <img
+                    src={previewUrl}
+                    alt="Prévia da imagem principal"
+                    className="max-h-full max-w-full object-contain"
+                  />
+                </div>
                 <div className="flex gap-2 border-t border-white/5 bg-ink/50 p-2">
                   <button
                     type="button"

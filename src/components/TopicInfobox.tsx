@@ -1,6 +1,8 @@
+import { useCallback, useState } from 'react'
 import { LAYER_COPY } from '../lib/icebergLayers'
 import { getLayerClass } from '../lib/layerClass'
 import type { IcebergTopic } from '../types/iceberg'
+import { ImageLightbox } from './ImageLightbox'
 import { LayerClassMark } from './LayerClassMark'
 
 type TopicInfoboxProps = {
@@ -11,15 +13,25 @@ type TopicInfoboxProps = {
 export function TopicInfobox({ topic, onEdit }: TopicInfoboxProps) {
   const copy = LAYER_COPY[topic.layer]
   const layerClass = getLayerClass(topic.layer)
+  const [lightboxOpen, setLightboxOpen] = useState(false)
+
+  const closeLightbox = useCallback(() => setLightboxOpen(false), [])
 
   return (
     <aside className="glass-strong overflow-hidden rounded-3xl lg:sticky lg:top-24">
       {topic.main_image_url && (
-        <img
-          src={topic.main_image_url}
-          alt={topic.title}
-          className="aspect-[4/3] w-full object-cover"
-        />
+        <button
+          type="button"
+          onClick={() => setLightboxOpen(true)}
+          className="flex aspect-[4/3] w-full cursor-zoom-in items-center justify-center bg-ink/90"
+          aria-label={`Ampliar imagem de ${topic.title}`}
+        >
+          <img
+            src={topic.main_image_url}
+            alt={topic.title}
+            className="max-h-full max-w-full object-contain"
+          />
+        </button>
       )}
       <div className="space-y-3 px-5 py-5">
         <div>
@@ -58,6 +70,11 @@ export function TopicInfobox({ topic, onEdit }: TopicInfoboxProps) {
           </button>
         )}
       </div>
+      <ImageLightbox
+        src={lightboxOpen ? topic.main_image_url : null}
+        alt={topic.title}
+        onClose={closeLightbox}
+      />
     </aside>
   )
 }
