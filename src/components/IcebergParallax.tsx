@@ -2,6 +2,7 @@ import { useRef } from 'react'
 import { ICEBERG_LAYERS } from '../lib/icebergLayers'
 import { useParallax } from '../hooks/useParallax'
 import type { IcebergTopic } from '../types/iceberg'
+import { IcebergAbyss } from './IcebergAbyss'
 import { IcebergLayerSection } from './IcebergLayer'
 
 const ICEBERG_SRC = '/iceberg-parallax.avif'
@@ -18,6 +19,7 @@ export function IcebergParallax({ topics, query }: IcebergParallaxProps) {
   const byLayer = ICEBERG_LAYERS.map((layer) =>
     topics.filter((topic) => topic.layer === layer),
   )
+  const searching = query.trim().length > 0
 
   return (
     <div className="iceberg-parallax-scene relative anim-fade-in">
@@ -40,6 +42,7 @@ export function IcebergParallax({ topics, query }: IcebergParallaxProps) {
             query={query}
           />
         ))}
+        {!searching && <IcebergAbyss />}
       </div>
     </div>
   )

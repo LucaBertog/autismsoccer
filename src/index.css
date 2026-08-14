@@ -285,6 +285,35 @@
     );
   }
 
+  .iceberg-abyss {
+    position: relative;
+    z-index: 0;
+    isolation: isolate;
+    min-height: min(120vh, 68rem);
+    margin-top: max(-68vh, -38rem);
+    overflow: hidden;
+    background: #a2a2a2;
+  }
+
+  .iceberg-abyss-image {
+    mix-blend-mode: multiply;
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center 42%;
+    animation: fade-in 1.2s ease both;
+  }
+
+  .iceberg-abyss-fade {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    background: linear-gradient(to bottom, #070d20 0%, transparent 100%);
+  }
+
   .anim-fade-in {
     animation: fade-in 0.55s ease both;
   }
@@ -537,6 +566,7 @@
     }
 
     .iceberg-parallax-image,
+    .iceberg-abyss-image,
     .topic-label,
     .topic-float,
     .fab-bob,

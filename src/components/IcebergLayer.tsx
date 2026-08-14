@@ -24,7 +24,7 @@ export function IcebergLayerSection({ layer, topics, query }: IcebergLayerSectio
 
   return (
     <section
-      className="iceberg-layer relative px-4 py-8 sm:px-8 sm:py-12"
+      className="iceberg-layer relative z-[1] px-4 py-8 sm:px-8 sm:py-12"
       style={{ minHeight: copy.minHeight }}
       aria-labelledby={`layer-${layer}`}
     >
