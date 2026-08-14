@@ -157,7 +157,7 @@ export function TopicDescriptionEditor({
         }),
         Image.configure({ inline: false, allowBase64: false }),
         Placeholder.configure({
-          placeholder: 'Contexto, pessoas envolvidas, lore… Cole imagens com Ctrl+V.',
+          placeholder: 'Contexto, pessoas envolvidas, lore… Cole imagens com Ctrl+V. Link de YouTube/Twitch/X sozinho vira embed.',
         }),
         FileHandler.configure({
           allowedMimeTypes: ['image/jpeg', 'image/png', 'image/webp', 'image/gif'],
@@ -252,7 +252,8 @@ export function TopicDescriptionEditor({
       />
 
       <p className="text-xs text-fog/80">
-        Clique no corpo da descrição, depois cole imagens com Ctrl+V ou botão direito → Colar.
+        Clique no corpo da descrição, depois cole imagens com Ctrl+V. Um link do YouTube, Twitch, X,
+        Instagram, TikTok ou Spotify sozinho em um parágrafo vira embed.
       </p>
     </div>
   )

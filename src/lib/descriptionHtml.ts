@@ -1,4 +1,5 @@
 import DOMPurify from 'dompurify'
+import { getMediaEmbed, standaloneUrlFromElement, type MediaEmbed } from './mediaEmbeds'
 
 const ALLOWED_TAGS = [
   'p',
@@ -63,6 +64,61 @@ export function descriptionToDisplayHtml(description: string): string {
   if (!trimmed) return ''
   const html = isLikelyHtml(trimmed) ? trimmed : plainTextToHtml(trimmed)
   return sanitizeDescriptionHtml(html)
+}
+
+export type DescriptionBlock =
+  | { type: 'html'; html: string }
+  | { type: 'embed'; embed: MediaEmbed }
+
+export function descriptionToContentBlocks(description: string): DescriptionBlock[] {
+  const sanitized = descriptionToDisplayHtml(description)
+  if (!sanitized) return []
+
+  const doc = new DOMParser().parseFromString(sanitized, 'text/html')
+  const blocks: DescriptionBlock[] = []
+  let htmlBuf = ''
+
+  const flush = () => {
+    if (!htmlBuf) return
+    blocks.push({ type: 'html', html: htmlBuf })
+    htmlBuf = ''
+  }
+
+  for (const node of Array.from(doc.body.childNodes)) {
+    if (node.nodeType === Node.ELEMENT_NODE) {
+      const el = node as Element
+      if (el.tagName === 'UL' || el.tagName === 'OL') {
+        const items = Array.from(el.children).filter((child) => child.tagName === 'LI')
+        const listEmbeds = items.map((item) => {
+          const url = standaloneUrlFromElement(item)
+          return url ? getMediaEmbed(url) : null
+        })
+        if (listEmbeds.length > 0 && listEmbeds.every((item) => item !== null)) {
+          flush()
+          for (const embed of listEmbeds) blocks.push({ type: 'embed', embed })
+          continue
+        }
+      }
+
+      const url = standaloneUrlFromElement(el)
+      const embed = url ? getMediaEmbed(url) : null
+      if (embed) {
+        flush()
+        blocks.push({ type: 'embed', embed })
+        continue
+      }
+      htmlBuf += el.outerHTML
+      continue
+    }
+
+    if (node.nodeType === Node.TEXT_NODE) {
+      const text = node.textContent ?? ''
+      if (text.trim()) htmlBuf += escapeHtml(text)
+    }
+  }
+
+  flush()
+  return blocks
 }
 
 export function isDescriptionEmpty(html: string): boolean {

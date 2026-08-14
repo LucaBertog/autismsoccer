@@ -1,6 +1,7 @@
 import { useCallback, useMemo, useState, type MouseEvent } from 'react'
-import { descriptionToDisplayHtml, isDescriptionEmpty } from '../lib/descriptionHtml'
+import { descriptionToContentBlocks, isDescriptionEmpty } from '../lib/descriptionHtml'
 import { ImageLightbox } from './ImageLightbox'
+import { MediaEmbedFrame } from './MediaEmbed'
 
 type TopicContentProps = {
   description: string
@@ -16,7 +17,7 @@ export function TopicContent({ description, className = '' }: TopicContentProps)
     setLightboxAlt('')
   }, [])
 
-  const displayHtml = useMemo(() => descriptionToDisplayHtml(description), [description])
+  const blocks = useMemo(() => descriptionToContentBlocks(description), [description])
   const empty = isDescriptionEmpty(description)
 
   function handleClick(e: MouseEvent<HTMLDivElement>) {
@@ -33,11 +34,19 @@ export function TopicContent({ description, className = '' }: TopicContentProps)
 
   return (
     <>
-      <div
-        className={`topic-description-content text-[15px] leading-relaxed text-mist ${className}`}
-        dangerouslySetInnerHTML={{ __html: displayHtml }}
-        onClick={handleClick}
-      />
+      <div className={`topic-description-content text-[15px] leading-relaxed text-mist ${className}`}>
+        {blocks.map((block, index) =>
+          block.type === 'embed' ? (
+            <MediaEmbedFrame key={`embed-${block.embed.provider}-${index}`} embed={block.embed} />
+          ) : (
+            <div
+              key={`html-${index}`}
+              dangerouslySetInnerHTML={{ __html: block.html }}
+              onClick={handleClick}
+            />
+          ),
+        )}
+      </div>
       <ImageLightbox src={lightboxSrc} alt={lightboxAlt} onClose={closeLightbox} />
     </>
   )

@@ -158,6 +158,77 @@
     margin-top: 0.85rem;
   }
 
+  .media-embed {
+    margin: 1rem 0;
+    overflow: hidden;
+    border-radius: 0.75rem;
+    border: 1px solid rgba(56, 189, 248, 0.18);
+    background: rgba(2, 6, 23, 0.55);
+  }
+
+  .media-embed figcaption {
+    padding: 0.45rem 0.75rem 0.6rem;
+    font-size: 0.75rem;
+  }
+
+  .media-embed figcaption a,
+  .media-embed-fallback {
+    color: #38bdf8;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  .media-embed-fallback {
+    display: block;
+    padding: 1rem 0.75rem;
+  }
+
+  .media-embed-frame {
+    position: relative;
+    width: 100%;
+    background: #020617;
+  }
+
+  .media-embed-frame iframe {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+  }
+
+  .media-embed--video .media-embed-frame {
+    aspect-ratio: 16 / 9;
+  }
+
+  .media-embed--portrait {
+    max-width: 22rem;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .media-embed--portrait .media-embed-frame {
+    aspect-ratio: 9 / 16;
+  }
+
+  .media-embed--audio .media-embed-frame {
+    height: 152px;
+  }
+
+  .media-embed--spotify .media-embed-frame {
+    height: 352px;
+  }
+
+  .media-embed-tweet {
+    min-height: 8rem;
+    padding: 0.5rem 0.25rem 0;
+  }
+
+  .media-embed-tweet twitter-widget,
+  .media-embed-tweet iframe {
+    margin: 0 auto !important;
+  }
+
   .iceberg-parallax-scene {
     --iceberg-zoom: 1.55;
     position: relative;
