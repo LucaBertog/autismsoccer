@@ -26,11 +26,11 @@ export function ImageLightbox({ src, alt = '', onClose }: ImageLightboxProps) {
     <div className="fixed inset-0 z-[80] flex items-center justify-center p-4 sm:p-8">
       <button
         type="button"
-        className="absolute inset-0 bg-slate-950/85 backdrop-blur-sm"
+        className="modal-overlay absolute inset-0 bg-slate-950/85 backdrop-blur-sm"
         aria-label="Fechar imagem"
         onClick={onClose}
       />
-      <div className="relative z-10 max-h-full max-w-full">
+      <div className="relative z-10 max-h-full max-w-full anim-scale-in">
         <button
           type="button"
           onClick={onClose}

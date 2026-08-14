@@ -45,7 +45,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
           <div
             key={toast.id}
             className={[
-              'glass-strong rounded-xl px-4 py-3 text-sm shadow-lg',
+              'glass-strong toast-in rounded-xl px-4 py-3 text-sm shadow-lg',
               toast.tone === 'success' && 'border-sky-bright/40 text-sky-100',
               toast.tone === 'error' && 'border-rose-400/40 text-rose-100',
               toast.tone === 'info' && 'text-slate-100',

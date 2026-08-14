@@ -54,7 +54,7 @@ export function LoginModal({ open, onClose, onSuccess }: LoginModalProps) {
     <div className="fixed inset-0 z-[70] flex items-center justify-center p-4">
       <button
         type="button"
-        className="absolute inset-0 bg-slate-950/70 backdrop-blur-sm"
+        className="modal-overlay absolute inset-0 bg-slate-950/70 backdrop-blur-sm"
         aria-label="Fechar login"
         onClick={onClose}
       />
@@ -62,7 +62,7 @@ export function LoginModal({ open, onClose, onSuccess }: LoginModalProps) {
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
-        className="glass-strong relative z-10 w-full max-w-md rounded-2xl p-6"
+        className="glass-strong modal-panel relative z-10 w-full max-w-md rounded-2xl p-6"
       >
         <div className="mb-5 flex items-start justify-between gap-3">
           <div>

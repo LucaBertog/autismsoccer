@@ -107,7 +107,7 @@ export function TopicPage() {
 
   if (notFound) {
     return (
-      <div className="mx-auto flex w-full max-w-lg flex-1 flex-col items-center justify-center px-4 py-16 text-center">
+      <div className="mx-auto flex w-full max-w-lg flex-1 flex-col items-center justify-center px-4 py-16 text-center anim-fade-up">
         <p className="text-xs uppercase tracking-[0.22em] text-sky-bright/80">Iceberg</p>
         <h1 className="mt-3 font-display text-3xl font-semibold text-white">
           Tópico não encontrado.
@@ -120,7 +120,7 @@ export function TopicPage() {
 
   if (error || !topic) {
     return (
-      <div className="mx-auto flex w-full max-w-lg flex-1 flex-col items-center justify-center px-4 py-16 text-center">
+      <div className="mx-auto flex w-full max-w-lg flex-1 flex-col items-center justify-center px-4 py-16 text-center anim-fade-up">
         <h1 className="font-display text-2xl font-semibold text-white">Não foi possível abrir o tópico.</h1>
         <p className="mt-3 text-sm text-rose-200/90">{error ?? 'Erro inesperado.'}</p>
         <BackToIcebergButton />
@@ -131,16 +131,16 @@ export function TopicPage() {
   return (
     <div className="mx-auto w-full max-w-6xl flex-1 px-4 py-8 sm:px-6 sm:py-10">
       <BackToIcebergButton />
-      <p className="text-xs text-fog/80">
+      <p className="text-xs text-fog/80 anim-fade-in">
         Iceberg <span className="text-white/40">›</span> {topic.title}
       </p>
 
       <div className="mt-8 grid items-start gap-8 lg:grid-cols-[minmax(0,1fr)_19rem] lg:gap-12">
-        <div className="order-1 lg:order-2">
+        <div className="order-1 anim-fade-up anim-delay-1 lg:order-2">
           <TopicInfobox topic={topic} onEdit={user ? () => setEditorOpen(true) : undefined} />
         </div>
 
-        <article className="order-2 mx-auto w-full max-w-2xl lg:order-1 lg:mx-0">
+        <article className="order-2 mx-auto w-full max-w-2xl anim-fade-up anim-delay-2 lg:order-1 lg:mx-0">
           <div className="hidden lg:block">
             <h1 className="font-display text-3xl font-semibold leading-tight text-white text-glow sm:text-4xl">
               {topic.title}

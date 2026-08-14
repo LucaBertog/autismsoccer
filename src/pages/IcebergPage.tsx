@@ -121,7 +121,7 @@ export function IcebergPage() {
 
   return (
     <div className="relative min-h-[calc(100dvh-4rem)] w-full">
-      <div className="sticky top-16 z-30 border-b border-white/5 bg-ink/40 backdrop-blur-md">
+      <div className="sticky top-16 z-30 border-b border-white/5 bg-ink/40 backdrop-blur-md anim-fade-down">
         <div className="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-2.5 sm:flex-row sm:items-center sm:justify-between sm:px-6">
           <div className="min-w-0">
             <h1 className="font-display text-lg font-semibold text-white text-glow sm:text-xl">
@@ -136,25 +136,25 @@ export function IcebergPage() {
       </div>
 
       {loading ? (
-        <div className="grid min-h-[60vh] place-items-center text-fog">Carregando tópicos…</div>
+        <div className="grid min-h-[60vh] place-items-center text-fog anim-fade-in">Carregando tópicos…</div>
       ) : (
         <IcebergParallax topics={topics} query={query} />
       )}
 
       {searching && !loading && !hasMatches && (
-        <div className="pointer-events-none absolute inset-x-0 top-40 z-20 mx-auto w-[min(92vw,28rem)] rounded-2xl border border-white/10 bg-ink/70 px-4 py-3 text-center text-sm text-mist backdrop-blur-md">
+        <div className="pointer-events-none absolute inset-x-0 top-40 z-20 mx-auto w-[min(92vw,28rem)] rounded-2xl border border-white/10 bg-ink/70 px-4 py-3 text-center text-sm text-mist backdrop-blur-md anim-scale-in">
           Nenhum tópico encontrado.
         </div>
       )}
 
       {!isSupabaseConfigured && (
-        <div className="fixed bottom-4 left-1/2 z-20 w-[min(92vw,28rem)] -translate-x-1/2 rounded-2xl border border-amber-400/30 bg-amber-400/15 px-4 py-3 text-center text-sm text-amber-100 backdrop-blur-md">
+        <div className="fixed bottom-4 left-1/2 z-20 w-[min(92vw,28rem)] -translate-x-1/2 rounded-2xl border border-amber-400/30 bg-amber-400/15 px-4 py-3 text-center text-sm text-amber-100 backdrop-blur-md anim-scale-in">
           Configure o Supabase no arquivo <code>.env</code> para persistir os tópicos.
         </div>
       )}
 
       {loadError && (
-        <div className="fixed bottom-4 left-1/2 z-20 w-[min(92vw,28rem)] -translate-x-1/2 rounded-2xl border border-rose-400/30 bg-rose-500/15 px-4 py-3 text-center text-sm text-rose-100 backdrop-blur-md">
+        <div className="fixed bottom-4 left-1/2 z-20 w-[min(92vw,28rem)] -translate-x-1/2 rounded-2xl border border-rose-400/30 bg-rose-500/15 px-4 py-3 text-center text-sm text-rose-100 backdrop-blur-md anim-scale-in">
           {loadError}
         </div>
       )}

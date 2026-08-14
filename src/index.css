@@ -193,6 +193,7 @@
     display: block;
     width: 100%;
     height: auto;
+    animation: fade-in 1.4s ease both;
   }
 
   .iceberg-layer {
@@ -213,13 +214,217 @@
     );
   }
 
+  .anim-fade-in {
+    animation: fade-in 0.55s ease both;
+  }
+
+  .anim-fade-up {
+    animation: fade-up 0.75s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .anim-fade-down {
+    animation: fade-down 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .anim-scale-in {
+    animation: scale-in 0.42s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .anim-delay-1 {
+    animation-delay: 90ms;
+  }
+
+  .anim-delay-2 {
+    animation-delay: 180ms;
+  }
+
+  .anim-delay-3 {
+    animation-delay: 280ms;
+  }
+
+  .anim-delay-4 {
+    animation-delay: 380ms;
+  }
+
+  .anim-reveal {
+    opacity: 0;
+    transform: translate3d(0, 18px, 0);
+    transition:
+      opacity 0.75s cubic-bezier(0.22, 1, 0.36, 1),
+      transform 0.75s cubic-bezier(0.22, 1, 0.36, 1);
+    transition-delay: var(--reveal-delay, 0ms);
+  }
+
+  .anim-reveal.is-visible {
+    opacity: 1;
+    transform: none;
+  }
+
+  .topic-float {
+    --drift-x: 4px;
+    --drift-y: -7px;
+    --drift-duration: 7s;
+    --drift-delay: 0s;
+    animation: topic-drift var(--drift-duration) ease-in-out infinite;
+    animation-delay: var(--drift-delay);
+    will-change: transform;
+  }
+
+  .topic-float:hover,
+  .topic-float:focus-within {
+    animation-play-state: paused;
+  }
+
+  .modal-overlay {
+    animation: fade-in 0.28s ease both;
+  }
+
+  .modal-panel {
+    animation: scale-in 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .toast-in {
+    animation: toast-in 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .fab-bob {
+    animation: fab-bob 4.8s ease-in-out infinite;
+  }
+
+  .fab-bob:hover,
+  .fab-bob:focus-visible {
+    animation-play-state: paused;
+  }
+
+  .glow-drift {
+    animation: glow-drift 12s ease-in-out infinite;
+  }
+
+  .glow-drift-slow {
+    animation: glow-drift 16s ease-in-out infinite reverse;
+  }
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes fade-up {
+    from {
+      opacity: 0;
+      transform: translate3d(0, 16px, 0);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  @keyframes fade-down {
+    from {
+      opacity: 0;
+      transform: translate3d(0, -10px, 0);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  @keyframes scale-in {
+    from {
+      opacity: 0;
+      transform: translate3d(0, 14px, 0) scale(0.97);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  @keyframes toast-in {
+    from {
+      opacity: 0;
+      transform: translate3d(14px, 8px, 0);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  @keyframes topic-drift {
+    0%,
+    100% {
+      transform: translate3d(0, 0, 0);
+    }
+    25% {
+      transform: translate3d(var(--drift-x), calc(var(--drift-y) * 0.4), 0);
+    }
+    50% {
+      transform: translate3d(calc(var(--drift-x) * -0.4), var(--drift-y), 0);
+    }
+    75% {
+      transform: translate3d(calc(var(--drift-x) * 0.55), calc(var(--drift-y) * 0.2), 0);
+    }
+  }
+
+  @keyframes fab-bob {
+    0%,
+    100% {
+      transform: translate3d(0, 0, 0);
+    }
+    50% {
+      transform: translate3d(0, -5px, 0);
+    }
+  }
+
+  @keyframes glow-drift {
+    0%,
+    100% {
+      opacity: 0.65;
+      transform: translate3d(0, 0, 0) scale(1);
+    }
+    50% {
+      opacity: 1;
+      transform: translate3d(14px, -10px, 0) scale(1.08);
+    }
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .iceberg-parallax-shift {
       transform: none !important;
       will-change: auto;
     }
 
-    .topic-label {
+    .iceberg-parallax-image,
+    .topic-label,
+    .topic-float,
+    .fab-bob,
+    .glow-drift,
+    .glow-drift-slow,
+    .anim-fade-in,
+    .anim-fade-up,
+    .anim-fade-down,
+    .anim-scale-in,
+    .modal-overlay,
+    .modal-panel,
+    .toast-in {
+      animation: none !important;
+      transition: none !important;
+    }
+
+    .topic-float {
+      will-change: auto;
+    }
+
+    .anim-reveal {
+      opacity: 1;
+      transform: none;
       transition: none;
     }
   }

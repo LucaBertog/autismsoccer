@@ -20,7 +20,7 @@ export function IcebergParallax({ topics, query }: IcebergParallaxProps) {
   )
 
   return (
-    <div className="iceberg-parallax-scene relative">
+    <div className="iceberg-parallax-scene relative anim-fade-in">
       <div className="iceberg-parallax-bg" aria-hidden>
         <div ref={bgRef} className="iceberg-parallax-shift">
           <div className="iceberg-parallax-figure">

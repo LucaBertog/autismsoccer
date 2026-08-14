@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import type { CSSProperties } from 'react'
 import { hashString } from '../lib/icebergLayers'
 import { getLayerClass } from '../lib/layerClass'
 import { saveIcebergReturn, topicAnchorId } from '../lib/icebergReturn'
@@ -21,27 +22,35 @@ const OFFSETS = [
 
 export function TopicLabel({ topic, dimmed = false }: TopicLabelProps) {
   const offset = OFFSETS[hashString(topic.id) % OFFSETS.length]
-  const lift = (hashString(topic.id + topic.title) % 3) * 6
+  const seed = hashString(topic.id + topic.title)
+  const lift = (seed % 3) * 6
   const layerClass = getLayerClass(topic.layer)
+  const driftStyle = {
+    marginTop: lift,
+    '--drift-x': `${((seed % 7) - 3) * 1.4}px`,
+    '--drift-y': `${-(6 + (seed % 5))}px`,
+    '--drift-duration': `${5.8 + (seed % 6) * 0.7}s`,
+    '--drift-delay': `${-((seed % 90) / 10)}s`,
+  } as CSSProperties
 
   return (
-    <Link
-      id={topicAnchorId(topic.id)}
-      to={`/topico/${topic.id}`}
-      aria-label={`Abrir tópico ${topic.title}, classe ${layerClass.code}`}
-      style={{ marginTop: lift }}
-      onClick={() => saveIcebergReturn(topic.id)}
-      className={[
-        'topic-label focus-ring inline-flex max-w-[min(100%,22rem)] items-center gap-2 rounded-full border px-3 py-1.5 text-sm font-medium tracking-wide',
-        'backdrop-blur-md transition duration-200',
-        offset,
-        dimmed
-          ? 'pointer-events-none scale-95 border-white/5 bg-ink/20 text-fog/40 opacity-20'
-          : 'border-sky-bright/25 bg-ink/55 text-slate-100 shadow-[0_8px_24px_rgba(2,6,23,0.35)] hover:-translate-y-0.5 hover:border-sky-bright/55 hover:bg-sky/20 hover:text-white hover:shadow-[0_0_22px_rgba(56,189,248,0.28)]',
-      ].join(' ')}
-    >
-      <LayerClassMark layer={topic.layer} />
-      <span className="truncate">{topic.title}</span>
-    </Link>
+    <div className={`topic-float ${offset}`} style={driftStyle}>
+      <Link
+        id={topicAnchorId(topic.id)}
+        to={`/topico/${topic.id}`}
+        aria-label={`Abrir tópico ${topic.title}, classe ${layerClass.code}`}
+        onClick={() => saveIcebergReturn(topic.id)}
+        className={[
+          'topic-label focus-ring inline-flex max-w-[min(100%,22rem)] items-center gap-2 rounded-full border px-3 py-1.5 text-sm font-medium tracking-wide',
+          'backdrop-blur-md transition duration-200',
+          dimmed
+            ? 'pointer-events-none scale-95 border-white/5 bg-ink/20 text-fog/40 opacity-20'
+            : 'border-sky-bright/25 bg-ink/55 text-slate-100 shadow-[0_8px_24px_rgba(2,6,23,0.35)] hover:-translate-y-0.5 hover:border-sky-bright/55 hover:bg-sky/20 hover:text-white hover:shadow-[0_0_22px_rgba(56,189,248,0.28)]',
+        ].join(' ')}
+      >
+        <LayerClassMark layer={topic.layer} />
+        <span className="truncate">{topic.title}</span>
+      </Link>
+    </div>
   )
 }

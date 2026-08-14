@@ -110,7 +110,7 @@ export function TopicEditor({
     <div className="fixed inset-0 z-[65] flex items-end justify-center p-0 sm:items-center sm:p-6">
       <button
         type="button"
-        className="absolute inset-0 bg-slate-950/70 backdrop-blur-sm"
+        className="modal-overlay absolute inset-0 bg-slate-950/70 backdrop-blur-sm"
         aria-label="Fechar editor"
         onClick={onClose}
       />
@@ -118,7 +118,7 @@ export function TopicEditor({
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
-        className="glass-strong relative z-10 flex max-h-[90dvh] w-full max-w-lg flex-col rounded-t-3xl sm:rounded-3xl"
+        className="glass-strong modal-panel relative z-10 flex max-h-[90dvh] w-full max-w-lg flex-col rounded-t-3xl sm:rounded-3xl"
       >
         <div className="flex items-start justify-between gap-3 border-b border-white/5 px-5 py-4">
           <h2 id={titleId} className="font-display text-lg font-semibold text-white">
