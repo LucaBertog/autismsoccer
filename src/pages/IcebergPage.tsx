@@ -6,6 +6,7 @@ import { TopicSearch } from '../components/TopicSearch'
 import { useAuth } from '../contexts/AuthContext'
 import { useToast } from '../components/Toast'
 import { isSupabaseConfigured } from '../lib/supabase'
+import { clearIcebergReturn, readIcebergReturn, restoreIcebergReturn } from '../lib/icebergReturn'
 import { topicMatchesQuery } from '../lib/topicSearch'
 import * as topicsService from '../services/icebergTopics'
 import type { IcebergTopic } from '../types/iceberg'
@@ -48,6 +49,35 @@ export function IcebergPage() {
   useEffect(() => {
     void refresh()
   }, [refresh])
+
+  useEffect(() => {
+    if (loading) return
+    if (!readIcebergReturn()) return
+
+    if ('scrollRestoration' in history) {
+      history.scrollRestoration = 'manual'
+    }
+
+    let cancelled = false
+    const apply = () => {
+      if (cancelled) return
+      restoreIcebergReturn()
+    }
+
+    const frame = window.requestAnimationFrame(() => {
+      window.requestAnimationFrame(apply)
+    })
+    const timeout = window.setTimeout(() => {
+      apply()
+      clearIcebergReturn()
+    }, 120)
+
+    return () => {
+      cancelled = true
+      window.cancelAnimationFrame(frame)
+      window.clearTimeout(timeout)
+    }
+  }, [loading, topics])
 
   async function handleSave(data: TopicEditorSavePayload) {
     if (!editor.open) return

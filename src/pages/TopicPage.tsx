@@ -1,11 +1,12 @@
 import { useCallback, useEffect, useState } from 'react'
-import { Link, useNavigate, useParams } from 'react-router-dom'
-import { ArrowLeft } from 'lucide-react'
+import { useNavigate, useParams } from 'react-router-dom'
+import { BackToIcebergButton } from '../components/BackToIcebergButton'
 import { TopicContent } from '../components/TopicContent'
 import { TopicEditor, type TopicEditorSavePayload } from '../components/TopicEditor'
 import { TopicInfobox } from '../components/TopicInfobox'
 import { useAuth } from '../contexts/AuthContext'
 import { useToast } from '../components/Toast'
+import { clearIcebergReturn } from '../lib/icebergReturn'
 import { isSupabaseConfigured } from '../lib/supabase'
 import * as topicsService from '../services/icebergTopics'
 import type { IcebergTopic } from '../types/iceberg'
@@ -77,6 +78,7 @@ export function TopicPage() {
     setSubmitting(true)
     try {
       await topicsService.deleteTopic(topic.id)
+      clearIcebergReturn()
       pushToast('Tópico excluído.', 'success')
       navigate('/iceberg')
     } catch (err) {
@@ -88,6 +90,7 @@ export function TopicPage() {
   if (loading) {
     return (
       <div className="mx-auto w-full max-w-6xl flex-1 px-4 py-10 sm:px-6">
+        <BackToIcebergButton />
         <div className="h-4 w-40 animate-pulse rounded bg-white/10" />
         <div className="mt-8 grid gap-8 lg:grid-cols-[minmax(0,1fr)_18rem]">
           <div className="space-y-4">
@@ -110,12 +113,7 @@ export function TopicPage() {
           Tópico não encontrado.
         </h1>
         <p className="mt-3 text-sm text-fog">Esse registro não existe ou foi removido.</p>
-        <Link
-          to="/iceberg"
-          className="focus-ring mt-8 rounded-xl border border-sky-bright/30 bg-sky/15 px-4 py-2.5 text-sm text-sky-100 hover:bg-sky/25"
-        >
-          Voltar para o Iceberg
-        </Link>
+        <BackToIcebergButton />
       </div>
     )
   }
@@ -125,26 +123,15 @@ export function TopicPage() {
       <div className="mx-auto flex w-full max-w-lg flex-1 flex-col items-center justify-center px-4 py-16 text-center">
         <h1 className="font-display text-2xl font-semibold text-white">Não foi possível abrir o tópico.</h1>
         <p className="mt-3 text-sm text-rose-200/90">{error ?? 'Erro inesperado.'}</p>
-        <Link
-          to="/iceberg"
-          className="focus-ring mt-8 rounded-xl border border-white/15 px-4 py-2.5 text-sm text-mist hover:bg-white/5"
-        >
-          Voltar para o Iceberg
-        </Link>
+        <BackToIcebergButton />
       </div>
     )
   }
 
   return (
     <div className="mx-auto w-full max-w-6xl flex-1 px-4 py-8 sm:px-6 sm:py-10">
-      <Link
-        to="/iceberg"
-        className="focus-ring inline-flex items-center gap-2 rounded-lg text-sm text-fog hover:text-sky-bright"
-      >
-        <ArrowLeft size={16} aria-hidden />
-        Voltar para o Iceberg
-      </Link>
-      <p className="mt-3 text-xs text-fog/80">
+      <BackToIcebergButton />
+      <p className="text-xs text-fog/80">
         Iceberg <span className="text-white/40">›</span> {topic.title}
       </p>
 

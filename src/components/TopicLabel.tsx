@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { hashString } from '../lib/icebergLayers'
+import { saveIcebergReturn, topicAnchorId } from '../lib/icebergReturn'
 import type { IcebergTopic } from '../types/iceberg'
 
 type TopicLabelProps = {
@@ -22,9 +23,11 @@ export function TopicLabel({ topic, dimmed = false }: TopicLabelProps) {
 
   return (
     <Link
+      id={topicAnchorId(topic.id)}
       to={`/topico/${topic.id}`}
       aria-label={`Abrir tópico: ${topic.title}`}
       style={{ marginTop: lift }}
+      onClick={() => saveIcebergReturn(topic.id)}
       className={[
         'topic-label focus-ring inline-flex max-w-[min(100%,20rem)] items-center rounded-full border px-3.5 py-1.5 text-sm font-medium tracking-wide',
         'backdrop-blur-md transition duration-200',

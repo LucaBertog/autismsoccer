@@ -3,6 +3,7 @@ import { LogIn, LogOut } from 'lucide-react'
 import { useState } from 'react'
 import { useAuth } from '../contexts/AuthContext'
 import { LoginModal } from './LoginModal'
+import { clearIcebergReturn } from '../lib/icebergReturn'
 
 export function Header() {
   const { user, signOut, loading } = useAuth()
@@ -27,7 +28,7 @@ export function Header() {
           </div>
 
           <nav className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-1 sm:flex" aria-label="Principal">
-            <NavLink to="/iceberg" className={linkClass}>
+            <NavLink to="/iceberg" className={linkClass} onClick={() => clearIcebergReturn()}>
               Iceberg
             </NavLink>
             <NavLink to="/sobre" className={linkClass}>
@@ -37,9 +38,9 @@ export function Header() {
 
           <div className="flex items-center gap-2">
             <nav className="flex items-center gap-1 sm:hidden" aria-label="Mobile">
-              <NavLink to="/iceberg" className={linkClass}>
-                Iceberg
-              </NavLink>
+            <NavLink to="/iceberg" className={linkClass} onClick={() => clearIcebergReturn()}>
+              Iceberg
+            </NavLink>
               <NavLink to="/sobre" className={linkClass}>
                 Sobre
               </NavLink>
